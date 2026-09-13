@@ -29,24 +29,59 @@ const NewTodoForm = ({ addTodo: _addTodo }) => {
   );
 };
 
-const TodoListItem = ({ todo, removeTodo: _removeTodo }) => {
+const TodoListItem = ({
+  todo,
+  removeTodo: _removeTodo,
+  modifyEditMode: _modifyEditMode,
+}) => {
+  const [editMode, setEditMode] = useState(false);
+
   const removeTodo = () => {
     _removeTodo(todo.id);
+  };
+
+  const modifyEditMode = () => {
+    setEditMode(true);
+  };
+
+  const cancelEdit = () => {
+    setEditMode(false);
   };
 
   return (
     <li className="flex gap-[5px]">
       <span className="badge badge-outline badge-primary">{todo.id}</span>
-      <span>{todo.title}</span>
-      <div className="btn-group flex gap-2">
-        <button className="btn btn-xs btn-outline">수정</button>
-        <button
-          className="btn btn-xs btn-outline btn-secondary"
-          onClick={removeTodo}
-        >
-          삭제
-        </button>
-      </div>
+      {editMode ? (
+        <form className="flex gap-[5px]" onSubmit={(e) => e.preventDefault()}>
+          <input
+            className="input input-bordered"
+            type="text"
+            placeholder="새 할일을 입력해주세요."
+            onChange={(e) => setNewTodoTitle(e.target.value)}
+          />
+          <button className="btn btn-outline btn-success" onClick={cancelEdit}>
+            수정완료
+          </button>
+          <button className="btn btn-outline btn-warning" onClick={cancelEdit}>
+            수정취소
+          </button>
+        </form>
+      ) : (
+        <>
+          <span>{todo.title}</span>
+          <div className="btn-group flex gap-2">
+            <button className="btn btn-xs btn-outline" onClick={modifyEditMode}>
+              수정
+            </button>
+            <button
+              className="btn btn-xs btn-outline btn-secondary"
+              onClick={removeTodo}
+            >
+              삭제
+            </button>
+          </div>
+        </>
+      )}
     </li>
   );
 };
