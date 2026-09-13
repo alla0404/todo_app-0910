@@ -29,8 +29,40 @@ const NewTodoForm = ({ addTodo: _addTodo }) => {
   );
 };
 
-const TodoList = ({ todos }) => {
-  return <>{JSON.stringify(todos)}</>;
+const TodoListItem = ({ todo, removeTodo: _removeTodo }) => {
+  const removeTodo = () => {
+    _removeTodo(todo.id);
+  };
+
+  return (
+    <li className="flex gap-[5px]">
+      <span className="badge badge-outline badge-primary">{todo.id}</span>
+      <span>{todo.title}</span>
+      <div className="btn-group flex gap-2">
+        <button className="btn btn-xs btn-outline">수정</button>
+        <button
+          className="btn btn-xs btn-outline btn-secondary"
+          onClick={removeTodo}
+        >
+          삭제
+        </button>
+      </div>
+    </li>
+  );
+};
+
+const TodoList = ({ todos, removeTodo }) => {
+  return (
+    <>
+      <nav className="menu-box mt-3">
+        <ul>
+          {todos.map((todo) => (
+            <TodoListItem key={todo.id} todo={todo} removeTodo={removeTodo} />
+          ))}
+        </ul>
+      </nav>
+    </>
+  );
 };
 
 const App = () => {
@@ -49,10 +81,15 @@ const App = () => {
     setLastTodoId(id);
   };
 
+  const removeTodo = (id) => {
+    const newTodos = todos.filter((todo) => todo.id != id);
+    setTodos(newTodos);
+  };
+
   return (
     <>
       <NewTodoForm addTodo={addTodo} />
-      <TodoList todos={todos} />
+      <TodoList todos={todos} removeTodo={removeTodo} />
     </>
   );
 };
