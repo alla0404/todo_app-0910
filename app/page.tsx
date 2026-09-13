@@ -2,14 +2,14 @@
 
 import React, { useState } from "react";
 
-const NewTodoForm = ({ addTodo: _addTodo }) => {
+const NewTodoForm = ({ todoStatus }) => {
   const [newTodoTitle, setnewTodoTitle] = useState("");
 
   const addTodo = () => {
     if (newTodoTitle.trim().length == 0) return;
 
     const title = newTodoTitle.trim();
-    _addTodo(title);
+    todoStatus.addTodo(title);
     setnewTodoTitle("");
   };
 
@@ -29,22 +29,18 @@ const NewTodoForm = ({ addTodo: _addTodo }) => {
   );
 };
 
-const TodoListItem = ({
-  todo,
-  removeTodo: _removeTodo,
-  modifyTodo: _modifyTodo,
-}) => {
+const TodoListItem = ({ todo, todoStatus }) => {
   const [editMode, setEditMode] = useState(false);
   const [newTodoTitle, setNewTodoTitle] = useState(todo.title);
 
   const removeTodo = () => {
-    _removeTodo(todo.id);
+    todoStatus.removeTodo(todo.id);
   };
 
   const modifyTodo = () => {
     if (newTodoTitle.trim().length == 0) return;
 
-    _modifyTodo(todo.id, newTodoTitle.trim());
+    todoStatus.modifyTodo(todo.id, newTodoTitle.trim());
     setEditMode(false);
   };
 
@@ -96,18 +92,13 @@ const TodoListItem = ({
   );
 };
 
-const TodoList = ({ todos, removeTodo, modifyTodo }) => {
+const TodoList = ({ todoStatus }) => {
   return (
     <>
       <nav className="menu-box mt-3">
         <ul>
-          {todos.map((todo) => (
-            <TodoListItem
-              key={todo.id}
-              todo={todo}
-              removeTodo={removeTodo}
-              modifyTodo={modifyTodo}
-            />
+          {todoStatus.todos.map((todo) => (
+            <TodoListItem key={todo.id} todo={todo} todoStatus={todoStatus} />
           ))}
         </ul>
       </nav>
@@ -115,7 +106,7 @@ const TodoList = ({ todos, removeTodo, modifyTodo }) => {
   );
 };
 
-const App = () => {
+const useTodoStatus = () => {
   const [todos, setTodos] = useState([]);
   const [lastTodoId, setLastTodoId] = useState(0);
 
@@ -144,10 +135,21 @@ const App = () => {
     setTodos(newTodos);
   };
 
+  return {
+    todos,
+    addTodo,
+    removeTodo,
+    modifyTodo,
+  };
+};
+
+const App = () => {
+  const todoStatus = useTodoStatus();
+
   return (
     <>
-      <NewTodoForm addTodo={addTodo} />
-      <TodoList todos={todos} removeTodo={removeTodo} modifyTodo={modifyTodo} />
+      <NewTodoForm todoStatus={todoStatus} />
+      <TodoList todoStatus={todoStatus} />
     </>
   );
 };
