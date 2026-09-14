@@ -1,22 +1,31 @@
 "use client";
 
 import { produce } from "immer";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 const NewTodoForm = ({ todoStatus }) => {
   const [newTodoTitle, setnewTodoTitle] = useState("");
+  const inputRef = useRef(null);
 
   const addTodo = () => {
-    if (newTodoTitle.trim().length == 0) return;
+    if (newTodoTitle.trim().length == 0) {
+      alert("할일을 입력해주세요.");
+
+      inputRef.current.focus();
+      return;
+    }
 
     const title = newTodoTitle.trim();
     todoStatus.addTodo(title);
     setnewTodoTitle("");
+
+    inputRef.current.focus();
   };
 
   return (
     <form className="flex gap-[5px]" onSubmit={(e) => e.preventDefault()}>
       <input
+        ref={inputRef}
         className="input input-bordered"
         type="text"
         value={newTodoTitle}
@@ -119,19 +128,33 @@ const useTodoStatus = () => {
       title,
     };
 
-    setTodos([...todos, newTodo]);
+    //setTodos(produce(todos, (draft) => draft.push(newTodo)));
+    setTodos([...todos, newTodo]); // 기존 방식
     setLastTodoId(id);
   };
 
   const removeTodo = (id) => {
-    const newTodos = todos.filter((todo) => todo.id != id);
-    setTodos(newTodos);
+    //setTodos(todos.filter((todo) => todo.id != id)); //기존 방식
+    setTodos(
+      produce(todos, (draft) => {
+        const index = draft.findIndex((todo) => todo.id == id);
+        draft.splice(index, 1);
+      }),
+    ); // immer 방식
   };
 
   const modifyTodo = (id, title) => {
+    /*
+    // 일반
     const newTodos = todos.map((todo) =>
       todo.id != id ? todo : { ...todo, title },
     );
+    */
+
+    const newTodos = produce(todos, (draft) => {
+      const index = draft.findIndex((todo) => todo.id == id);
+      draft[index].title = title;
+    });
 
     setTodos(newTodos);
   };
