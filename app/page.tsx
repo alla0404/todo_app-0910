@@ -1,11 +1,15 @@
 "use client";
 
 import { produce } from "immer";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const NewTodoForm = ({ todoStatus }) => {
   const [newTodoTitle, setnewTodoTitle] = useState("");
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
 
   const addTodo = () => {
     if (newTodoTitle.trim().length == 0) {
